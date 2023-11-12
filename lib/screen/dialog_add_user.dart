@@ -47,277 +47,286 @@ class _DialogAddUserState extends ConsumerState<DialogAddUser> {
   Widget build(BuildContext context) {
     final fireStore = ref.watch(pFireStore);
     return Dialog(
-      child: PhysicalModel(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        elevation: 5,
-        child: Stack(
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Ảnh
-                      Column(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Flexible(
+            child: SingleChildScrollView(
+              child: PhysicalModel(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+                elevation: 5,
+                child: Stack(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+                      child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const SizedBox(
-                            height: 20,
-                          ),
-                          Container(
-                              width: 150,
-                              height: 200,
-                              child: avatar != null
-                                  ? ExtendedImage.memory(
-                                      avatar!,
-                                      fit: BoxFit.cover,
-                                    )
-                                  : ((editModel.image?.isNotEmpty ?? false)
-                                      ? ExtendedImage.network(
-                                          editModel.image!,
-                                          fit: BoxFit.cover,
-                                        )
-                                      : Padding(
-                                          padding: const EdgeInsets.all(2.0),
-                                          child: DottedBorder(
-                                            color: Colors.black,
-                                            strokeWidth: 1,
-                                            dashPattern: const <double>[8, 4],
-                                            child: const Center(
-                                              child: Icon(
-                                                Icons.person_pin_outlined,
-                                                size: 40,
-                                                color: Colors.grey,
-                                              ),
-                                            ),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Ảnh
+                              Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  Container(
+                                      width: 150,
+                                      height: 200,
+                                      child: avatar != null
+                                          ? ExtendedImage.memory(
+                                              avatar!,
+                                              fit: BoxFit.cover,
+                                            )
+                                          : ((editModel.image?.isNotEmpty ?? false)
+                                              ? ExtendedImage.network(
+                                                  editModel.image!,
+                                                  fit: BoxFit.cover,
+                                                )
+                                              : Padding(
+                                                  padding: const EdgeInsets.all(2.0),
+                                                  child: DottedBorder(
+                                                    color: Colors.black,
+                                                    strokeWidth: 1,
+                                                    dashPattern: const <double>[8, 4],
+                                                    child: const Center(
+                                                      child: Icon(
+                                                        Icons.person_pin_outlined,
+                                                        size: 40,
+                                                        color: Colors.grey,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ))),
+                                  const SizedBox(
+                                    height: 16,
+                                  ),
+                                  if (isEnableEdit)
+                                    Material(
+                                      color: Colors.grey.shade100,
+                                      borderRadius: BorderRadius.circular(8),
+                                      child: InkWell(
+                                        onTap: () async {
+                                          final file = await ImageUtil.pickImage();
+                                          if (file != null) {
+                                            avatar = await file.readAsBytes();
+                                            this.file = file;
+                                            setState(() {});
+                                          }
+                                        },
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(8),
+                                            border: Border.all(color: Colors.blueAccent.shade700, width: 2),
                                           ),
-                                        ))),
-                          const SizedBox(
-                            height: 16,
-                          ),
-                          if (isEnableEdit)
-                            Material(
-                              color: Colors.grey.shade100,
-                              borderRadius: BorderRadius.circular(8),
-                              child: InkWell(
-                                onTap: () async {
-                                  final file = await ImageUtil.pickImage();
-                                  if (file != null) {
-                                    avatar = await file.readAsBytes();
-                                    this.file = file;
-                                    setState(() {});
-                                  }
-                                },
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(color: Colors.blueAccent.shade700, width: 2),
-                                  ),
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        Icons.photo_library_outlined,
-                                        size: 25,
-                                        color: Colors.blueAccent.shade700,
+                                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                                          child: Row(
+                                            children: [
+                                              Icon(
+                                                Icons.photo_library_outlined,
+                                                size: 25,
+                                                color: Colors.blueAccent.shade700,
+                                              ),
+                                              const Text(
+                                                'Tải ảnh lên',
+                                                style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
+                                              )
+                                            ],
+                                          ),
+                                        ),
                                       ),
-                                      const Text(
-                                        'Tải ảnh lên',
-                                        style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
-                                      )
-                                    ],
-                                  ),
-                                ),
+                                    )
+                                ],
                               ),
-                            )
+                              const SizedBox(
+                                width: 30,
+                              ),
+                              // Nhập thông tin
+                              Container(
+                                constraints: const BoxConstraints(maxWidth: 400, minWidth: 100),
+                                margin: const EdgeInsets.only(left: 16),
+                                child: Column(
+                                  children: [
+                                    BaseTextInput(
+                                      title: 'Họ và tên',
+                                      initMessage: editModel.name ?? '',
+                                      onChanged: (text) {
+                                        editModel.name = text ?? '';
+                                      },
+                                      enable: isEnableEdit,
+                                    ),
+                                    BaseTextInput(
+                                      title: 'Ngày tháng năm sinh',
+                                      key: ValueKey("date ${editModel.birth}"),
+                                      initMessage: editModel.birth ?? '',
+                                      onChanged: (text) {
+                                        // editModel.birth = text ?? '';
+                                      },
+                                      enable: isEnableEdit,
+                                      onClick: () async {
+                                        DateTime? selectedDate = await showDatePicker(
+                                          context: context,
+                                          initialDate: DateTime.now(),
+                                          firstDate: DateTime(1950),
+                                          lastDate: DateTime(2100),
+                                        );
+
+                                        if (selectedDate != null) {
+                                          editModel.birth = DateFormat('dd/MM/yyyy').format(selectedDate);
+                                          setState(() {});
+                                        }
+                                      },
+                                    ),
+                                    BaseTextInput(
+                                      title: 'Quê quán',
+                                      initMessage: editModel.address ?? '',
+                                      onChanged: (text) {
+                                        editModel.address = text ?? '';
+                                      },
+                                      enable: isEnableEdit,
+                                    ),
+                                    BaseTextInput(
+                                      title: 'Trình đô đào tạo',
+                                      initMessage: editModel.education ?? '',
+                                      onChanged: (text) {
+                                        editModel.education = text ?? '';
+                                      },
+                                      enable: isEnableEdit,
+                                    ),
+                                    BaseTextInput(
+                                      title: 'Chức vụ',
+                                      initMessage: editModel.position ?? '',
+                                      onChanged: (text) {
+                                        editModel.position = text ?? '';
+                                      },
+                                      enable: isEnableEdit,
+                                    ),
+                                    BaseTextInput(
+                                      title: 'Thành tích cao nhất năm học trước',
+                                      initMessage: editModel.achievements ?? '',
+                                      onChanged: (text) {
+                                        editModel.achievements = text ?? '';
+                                      },
+                                      enable: isEnableEdit,
+                                    ),
+                                  ],
+                                ),
+                              )
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 24,
+                          ),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: isEdit
+                                ? [
+                                    BaseButton(
+                                      onClick: () {
+                                        setState(() {
+                                          isEnableEdit = !isEnableEdit;
+                                        });
+                                        if (!isEnableEdit) {
+                                          updateUser();
+                                        }
+                                      },
+                                      icon: Icons.edit,
+                                      text: isEnableEdit ? 'Lưu thông tin' : 'Chỉnh sửa',
+                                    ),
+                                    const SizedBox(
+                                      width: 20,
+                                    ),
+                                    BaseButton(
+                                      onClick: () async {
+                                        final res = await showDialog(
+                                            context: context,
+                                            builder: (context) {
+                                              return AlertDialog(
+                                                title: const Text('Xác nhận'),
+                                                content: const Text('Bạn có chắc muốn xoá người dùng?'),
+                                                actions: <Widget>[
+                                                  TextButton(
+                                                    child: const Text('Xác nhận'),
+                                                    onPressed: () {
+                                                      Navigator.of(context).pop(true);
+                                                    },
+                                                  ),
+                                                  TextButton(
+                                                    child: const Text('Đóng'),
+                                                    onPressed: () {
+                                                      Navigator.of(context).pop(false);
+                                                    },
+                                                  ),
+                                                ],
+                                              );
+                                            });
+                                        if (res == true) {
+                                          setState(() {
+                                            isLoading = true;
+                                          });
+                                          final fireStore = ref.read(pFireStore);
+                                          await fireStore.deleteUser(editModel);
+                                          await fireStore.loadUsers();
+                                          setState(() {
+                                            isLoading = false;
+                                          });
+                                          if (mounted) {
+                                            Navigator.of(context).pop();
+                                          }
+                                        }
+                                      },
+                                      icon: Icons.delete_forever_outlined,
+                                      text: 'Xoá',
+                                    ),
+                                    const SizedBox(
+                                      width: 20,
+                                    ),
+                                    BaseButton(
+                                      onClick: () {
+                                        Navigator.pop(context);
+                                      },
+                                      icon: Icons.close,
+                                      text: 'Đóng',
+                                    ),
+                                  ]
+                                : [
+                                    BaseButton(
+                                      onClick: () async {
+                                        updateUser();
+                                      },
+                                      icon: Icons.add,
+                                      text: 'Thêm mới',
+                                    ),
+                                    const SizedBox(
+                                      width: 20,
+                                    ),
+                                    BaseButton(
+                                      onClick: () {
+                                        Navigator.pop(context);
+                                      },
+                                      icon: Icons.close,
+                                      text: 'Đóng',
+                                    ),
+                                  ],
+                          ),
                         ],
                       ),
-                      const SizedBox(
-                        width: 30,
-                      ),
-                      // Nhập thông tin
-                      Container(
-                        constraints: const BoxConstraints(maxWidth: 400, minWidth: 100),
-                        margin: const EdgeInsets.only(left: 16),
-                        child: Column(
-                          children: [
-                            BaseTextInput(
-                              title: 'Họ và tên',
-                              initMessage: editModel.name ?? '',
-                              onChanged: (text) {
-                                editModel.name = text ?? '';
-                              },
-                              enable: isEnableEdit,
-                            ),
-                            BaseTextInput(
-                              title: 'Ngày tháng năm sinh',
-                              key: ValueKey("date ${editModel.birth}"),
-                              initMessage: editModel.birth ?? '',
-                              onChanged: (text) {
-                                // editModel.birth = text ?? '';
-                              },
-                              enable: isEnableEdit,
-                              onClick: () async {
-                                DateTime? selectedDate = await showDatePicker(
-                                  context: context,
-                                  initialDate: DateTime.now(),
-                                  firstDate: DateTime(1950),
-                                  lastDate: DateTime(2100),
-                                );
-
-                                if (selectedDate != null) {
-                                  editModel.birth = DateFormat('dd/MM/yyyy').format(selectedDate);
-                                  setState(() {});
-                                }
-                              },
-                            ),
-                            BaseTextInput(
-                              title: 'Quê quán',
-                              initMessage: editModel.address ?? '',
-                              onChanged: (text) {
-                                editModel.address = text ?? '';
-                              },
-                              enable: isEnableEdit,
-                            ),
-                            BaseTextInput(
-                              title: 'Trình đô đào tạo',
-                              initMessage: editModel.education ?? '',
-                              onChanged: (text) {
-                                editModel.education = text ?? '';
-                              },
-                              enable: isEnableEdit,
-                            ),
-                            BaseTextInput(
-                              title: 'Chức vụ',
-                              initMessage: editModel.position ?? '',
-                              onChanged: (text) {
-                                editModel.position = text ?? '';
-                              },
-                              enable: isEnableEdit,
-                            ),
-                            BaseTextInput(
-                              title: 'Thành tích cao nhất năm học trước',
-                              initMessage: editModel.achievements ?? '',
-                              onChanged: (text) {
-                                editModel.achievements = text ?? '';
-                              },
-                              enable: isEnableEdit,
-                            ),
-                          ],
-                        ),
-                      )
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 24,
-                  ),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: isEdit
-                        ? [
-                            BaseButton(
-                              onClick: () {
-                                setState(() {
-                                  isEnableEdit = !isEnableEdit;
-                                });
-                                if (!isEnableEdit) {
-                                  updateUser();
-                                }
-                              },
-                              icon: Icons.edit,
-                              text: isEnableEdit ? 'Lưu thông tin' : 'Chỉnh sửa',
-                            ),
-                            const SizedBox(
-                              width: 20,
-                            ),
-                            BaseButton(
-                              onClick: () async {
-                                final res = await showDialog(
-                                    context: context,
-                                    builder: (context) {
-                                      return AlertDialog(
-                                        title: const Text('Xác nhận'),
-                                        content: const Text('Bạn có chắc muốn xoá người dùng?'),
-                                        actions: <Widget>[
-                                          TextButton(
-                                            child: const Text('Xác nhận'),
-                                            onPressed: () {
-                                              Navigator.of(context).pop(true);
-                                            },
-                                          ),
-                                          TextButton(
-                                            child: const Text('Đóng'),
-                                            onPressed: () {
-                                              Navigator.of(context).pop(false);
-                                            },
-                                          ),
-                                        ],
-                                      );
-                                    });
-                                if (res == true) {
-                                  setState(() {
-                                    isLoading = true;
-                                  });
-                                  final fireStore = ref.read(pFireStore);
-                                  await fireStore.deleteUser(editModel);
-                                  await fireStore.loadUsers();
-                                  setState(() {
-                                    isLoading = false;
-                                  });
-                                  if (mounted) {
-                                    Navigator.of(context).pop();
-                                  }
-                                }
-                              },
-                              icon: Icons.delete_forever_outlined,
-                              text: 'Xoá',
-                            ),
-                            const SizedBox(
-                              width: 20,
-                            ),
-                            BaseButton(
-                              onClick: () {
-                                Navigator.pop(context);
-                              },
-                              icon: Icons.close,
-                              text: 'Đóng',
-                            ),
-                          ]
-                        : [
-                            BaseButton(
-                              onClick: () async {
-                                updateUser();
-                              },
-                              icon: Icons.add,
-                              text: 'Thêm mới',
-                            ),
-                            const SizedBox(
-                              width: 20,
-                            ),
-                            BaseButton(
-                              onClick: () {
-                                Navigator.pop(context);
-                              },
-                              icon: Icons.close,
-                              text: 'Đóng',
-                            ),
-                          ],
-                  ),
-                ],
+                    ),
+                    if (isLoading)
+                      const Positioned.fill(
+                          child: Center(
+                        child: CircularProgressIndicator(),
+                      ))
+                  ],
+                ),
               ),
             ),
-            if (isLoading)
-              const Positioned.fill(
-                  child: Center(
-                child: CircularProgressIndicator(),
-              ))
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

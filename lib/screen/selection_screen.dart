@@ -42,7 +42,7 @@ class _SelectionScreenState extends State<SelectionScreen> {
                   constraints: const BoxConstraints(
                     maxWidth: 500,
                   ),
-                  margin: const EdgeInsets.only(top: 100),
+                  margin: const EdgeInsets.only(top: 60),
                   child: PhysicalModel(
                     borderRadius: BorderRadius.circular(8),
                     elevation: 2,
